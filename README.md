@@ -1,9 +1,9 @@
 # smock-recipes
 
-How the data that [smock](https://github.com/plachance14/smock) downloads were made. smock users
+How the PSFs and AGN grids that [smock](https://github.com/plachance14/smock) uses were made. smock users
 don't need anything here: the products below come ready-made in smock's
 [Google Drive folder](https://drive.google.com/drive/folders/1aruCXByevDyer_LeufUUbo_knz311sDV?usp=sharing).
-This repository is for rebuilding them, changing them, or making new ones the same way.
+This repository is for rebuilding them, changing them, or making slightly different ones following the same recipe.
 
 There is one folder per product. Each README has the same sections: the product, what you need,
 the steps, the problems met along the way and how the recipe deals with them, and how the result
@@ -13,8 +13,8 @@ before simplifying a recipe, or an old problem may come back.
 | Product | Recipe | Where it goes | Checked |
 |---|---|---|---|
 | CLOUDY AGN grids (standard-BLR and gas-enshrouded cores, 17 variations) | [`agn_grid/`](agn_grid/) | `SYNTHESIZER_DIR/grids/agn/` | two grids rebuilt from the kept CLOUDY runs are identical to the shipped ones |
-| NIRCam PSFs at 0.03″, 7 filters | [`psfs/`](psfs/) | `SYNTHESIZER_DIR/instrument_cache/psfs/` | reproduced bit for bit |
-| ASTRID PIG_047 test cutout | [`test_cutout/`](test_cutout/) | `smock/test_data/ASTRID/PIG_047_subfind/` | reproduced byte for byte |
+| NIRCam PSFs at 0.03″, 7 filters | [`psfs/`](psfs/) | `SYNTHESIZER_DIR/instrument_cache/psfs/` | reproduced exactly |
+| ASTRID PIG_047 test cutout | [`test_cutout/`](test_cutout/) | `smock/test_data/ASTRID/PIG_047_subfind/` | reproduced exactly |
 
 `SYNTHESIZER_DIR` is synthesizer's own data folder, which smock shares (see smock's `SETUP.txt`
 and `smock/config.py`). The Drive folder also holds the BPASS 2.2.1 grid the walkthrough uses
