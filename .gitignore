@@ -1,0 +1,25 @@
+# Large or generated data: produced by the recipes, not committed
+*.hdf5
+*.h5
+*.fits
+*.npz
+*.npy
+runs/
+*.con
+*.out
+*.ovr
+*.per
+
+# Work directories and tool envs: cloudy_runs/ holds the AGN grid's CLOUDY runs, external/ the
+# PSF recipe's STPSF venv and data
+cloudy_runs/
+external/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# OS / editor
+.DS_Store
+Thumbs.db

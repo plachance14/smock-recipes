@@ -1,0 +1,30 @@
+# Dense fiducial (the published production setup): base for the one-at-a-time variations
+# (dense_variations/*.yaml override one axis each; alpha_ox and alpha_uv variations use this file with
+# the matching agn-cloudy_T20_* incident grids).
+ionisation_parameter: 0.03162277660168379   # log U -1.5
+hydrogen_density: 3162277660.1683793   # 10^9.5
+stop_column_density: 24.5
+turbulence: 400
+metallicities: 0.0015       # 0.1 Z_sun
+
+# --- shared run settings (cloudy_grid_plan.txt "Run settings") ---
+cloudy_version: c23.01
+reference_abundance: GalacticConcordance   # Nicholls+17, Z_sun = 0.015 (author, 14 Oct 2026)
+alpha_enhancement: 0.0
+abundance_scalings:
+  nitrogen: GalacticConcordance
+  carbon: GalacticConcordance
+depletion_model:            # none: no grains inside the BLR / envelope; dust comes from the LOS model
+depletion_scale: 1.0
+grains:
+geometry: planeparallel
+ionisation_parameter_model: fixed   # U fixed per grid point
+T_floor: 100                # with a stop column, syncretize also writes "stop temperature off"
+cosmic_rays: true
+CMB:
+z: 0.0
+nend: 6000
+iterate_to_convergence: true
+resolution: 1.0
+output_cont: true
+output_linelist: linelist-standard.dat
