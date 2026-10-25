@@ -101,8 +101,8 @@ def add_robustness_limits(text):
     "iterate to convergence" -> "... 100" (default limit 10), plus "failures 100"
     (convergence-failure abort, default 20) and "set pressure ionize 300000" (pressure-
     ionisation calls per zone, default 3000). Each acts only on a run that reaches its
-    limit: in the no-op test (17 Oct 2026, job 1388753) 8 healthy production runs came
-    out byte-identical with each one. Production (15 Oct) was generated before these
+    limit: in the healthy-run test (17 Oct 2026, job 1388753) 8 healthy production runs came
+    out identical with each one. Production (15 Oct) was generated before these
     became defaults; its failures got them in reruns. "database H-like masers off" is
     deliberately not here: it changes healthy runs and is for maser aborts only.
     """

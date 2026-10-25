@@ -61,7 +61,7 @@ list, swap that prefix for the current work directory first (e.g. with `sed` int
    throttle arrays with `%10`).
 4. `parse_cloudy_runs.py`: classify every run (`ok`, failure class, `thick_es`).
 5. `make_rerun_inputs.py`: stage edited copies of failed runs in `cloudy_runs/reruns/<name>/`,
-   then step 3 on their run list. The decks already carry every fix that is a no-op for healthy
+   then step 3 on their run list. The decks already carry every fix that changes nothing for healthy
    runs (`make_cloudy_inputs.py`: no `turbulence 0`, `failures 100`, `set pressure ionize
    300000`, `iterate to convergence 100`). Of production's failures inside the kept T ranges,
    those defaults would leave two kinds that need a rerun (report §1a, §4): maser aborts
@@ -81,7 +81,7 @@ list, swap that prefix for the current work directory first (e.g. with `sed` int
 The full commands for each stage are in each script's usage lines (and, for the shipped grids, in the ROADMAP status log).
 
 ## 4. Problems solved
-See `cloudy_grid_report.md`: failure classes (§4), the fixes and their no-op checks (§5), and
+See `cloudy_grid_report.md`: failure classes (§4), the fixes and the checks that they change nothing for healthy runs (§5), and
 the two syncretize problems handled by the builder (§6: the per-L☉ normalisation and
 the NZONE-blind failure test).
 
