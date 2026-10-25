@@ -1,7 +1,7 @@
 # Recipe: ASTRID test cutout
 
 **Status: done** (24 Oct 2026). The product was made and validated on 15 Oct 2026, and the
-recipe reproduces it byte for byte (§5).
+recipe reproduces it exactly (§5).
 
 ## 1. Product
 A small BigFile with a PIG's block layout, holding 5 FoF groups (264, 557, 784, 9732, 736267;
@@ -55,5 +55,5 @@ arrays are identical, then checks units.
   of the 105 objects with stars) and the cutout rewritten.
 - **Reproduction, 24 Oct 2026:** `--apply --out-dir runs/test_cutout_repro` (10 s on the
   login node) rewrote the cutout, which then validated as above.
-  All 228 files are byte-identical to the shipped cutout's, except the first line of
+  All 228 files are identical to the shipped cutout's, except the first line of
   `README.txt` (the date, and the script's path before the repo split).

@@ -106,7 +106,7 @@ Solved in the builder since:
 normalisation is within 1.4×10⁻⁴ of the incident grid; 1,100 sampled models (every rerun and
 limit cycle included) equal their own CLOUDY runs to 2×10⁻¹⁶; `smock_flags` matches
 `MANIFEST.tsv`; there are no failures or empty models; the fill's leave-one-out errors are
-1.5–3.5%. The installed files are byte-identical to the builds.
+1.5–3.5%. The installed files are identical to the builds.
 
 **Reproduction.** CLOUDY is not rerun for this (author, 24 Oct 2026): the grid may change with
 the author's work on the CLOUDY AGN incident shape, and the whole grid could be rerun in about

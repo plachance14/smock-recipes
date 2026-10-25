@@ -1,6 +1,6 @@
 # smock-recipes
 
-How the PSFs and AGN grids that [smock](https://github.com/plachance14/smock) uses were made. smock users
+How the PSFs, AGN grids and test cutout that [smock](https://github.com/plachance14/smock) uses were made. smock users
 don't need anything here: the products below come ready-made in smock's
 [Google Drive folder](https://drive.google.com/drive/folders/1aruCXByevDyer_LeufUUbo_knz311sDV?usp=sharing).
 This repository is for rebuilding them, changing them, or making slightly different ones following the same recipe.

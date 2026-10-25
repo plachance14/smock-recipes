@@ -1,6 +1,6 @@
 # Recipe: NIRCam PSFs at 0.03″
 
-**Status:** done. Product made 16 Oct 2026; reproduced bit for bit on 23 Oct 2026 (§5).
+**Status:** done. Product made 16 Oct 2026; reproduced exactly on 23 Oct 2026 (§5).
 
 ## 1. Product
 Seven files, `NIRCam_<filter>_0.03arcsec.fits` for F090W, F115W, F150W, F200W, F277W, F356W and
@@ -55,5 +55,5 @@ and `EE_R0P1` (encircled energy in r = 0.1″, used by the depth-to-noise conver
 
 **Reproduction (23 Oct 2026):** all 7 filters regenerated with §3's command, in a venv rebuilt
 with the commands above (its unpinned dependencies had drifted, e.g. synphot 1.7.0 →
-1.8.0), are bit-identical to the installed files in both products, `DET_SAMP` and `OVERSAMP`,
+1.8.0), are identical to the installed files in both products, `DET_SAMP` and `OVERSAMP`,
 with the same `FOVSUM` and `EE_R0P1` (`archive/2026-10-23_psf_reproduction/compare_psfs.txt`).

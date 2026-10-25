@@ -104,14 +104,14 @@ Also, 181 runs are electron-scattering thick (τ_es ≈ 5–8; N_H 10^25–25.5)
 - **Decision (author, 18 Oct):** keep the production spectrum, flag it `limit_cycle`, and store the half-amplitude (the largest over the bands, Lyα included) in `smock_cycle_half_amplitude`. Production is within the cycle (BLR median 5.9% from the cycle mean, dense 1.9%), and the per-iteration saves hold only the continuum, so a cycle-mean spectrum would not match its lines.
 
 ## 5. Fixes and how they were checked
-Each fix was applied only to runs that had failed, so production's successful runs are untouched. **No-op test (1388753, 17 Oct; `cloudy_runs/reruns/noop_test/compare_noop.txt`):** an unchanged rerun reproduces production byte for byte (8/8), so the comparison is exact. The runs: dense 11/828 (pressure–ionisation corner, log T 4.8), dense 18/741 (log T 6.25), dense 4/320 (log T 4.2, maser regime), BLR 5/155 (log T 4.25, maser regime), dense 14/0 (typical), BLR 13/25 and 14/91 (9 iterations), and one BLR variation run. Whether each fix could become a recipe default depends on whether it changes a healthy run. The no-op test (1388753) checks this directly: 8 healthy production runs from the risky regimes, each rerun with each fix alone and with all of them together, compared byte for byte with an unchanged rerun.
+Each fix was applied only to runs that had failed, so production's successful runs are untouched. **No-op test (1388753, 17 Oct; `cloudy_runs/reruns/noop_test/compare_noop.txt`):** an unchanged rerun reproduces production exactly (8/8), so the comparison is exact. The runs: dense 11/828 (pressure–ionisation corner, log T 4.8), dense 18/741 (log T 6.25), dense 4/320 (log T 4.2, maser regime), BLR 5/155 (log T 4.25, maser regime), dense 14/0 (typical), BLR 13/25 and 14/91 (9 iterations), and one BLR variation run. Whether each fix could become a recipe default depends on whether it changes a healthy run. The no-op test (1388753) checks this directly: 8 healthy production runs from the risky regimes, each rerun with each fix alone and with all of them together, compared exactly with an unchanged rerun.
 
 | Fix | Acts on | Evidence it helps | No-op for healthy runs? |
 |---|---|---|---|
 | Omit `turbulence 0` | v_turb = 0 decks only | 20/20 ok | yes, by construction (it only touches those decks) |
-| `set pressure ionize 30000` → 300000 | runs that reach the cap | 37/62 at 30000 | **yes**: byte-identical, 8/8 |
-| `failures 100` | runs that reach 20 convergence failures | 2/2: BLR Z 3 Z☉ variation (fix_test_6) and dense 19/828 (fix_test_5) | **yes**: byte-identical, 8/8 |
-| `iterate to convergence 100` | runs not converged in 10 iterations | 69 of 137 converged; 67 of them moved up to 28% outside Lyα, so their 10-iteration spectra are replaced | **yes**: byte-identical, 8/8, including two runs that needed 9 iterations |
+| `set pressure ionize 30000` → 300000 | runs that reach the cap | 37/62 at 30000 | **yes**: identical, 8/8 |
+| `failures 100` | runs that reach 20 convergence failures | 2/2: BLR Z 3 Z☉ variation (fix_test_6) and dense 19/828 (fix_test_5) | **yes**: identical, 8/8 |
+| `iterate to convergence 100` | runs not converged in 10 iterations | 69 of 137 converged; 67 of them moved up to 28% outside Lyα, so their 10-iteration spectra are replaced | **yes**: identical, 8/8, including two runs that needed 9 iterations |
 | `database H-like masers off` | H-like masing levels | 3/3 dense log T 4.2 maser aborts ok; the BLR nudge ok | **no**: it changes all 8 (continuum up to 0.8% of its peak, lines up to 0.1%, zone counts shift), and it made the healthy dense 11/828 abort on the pressure–ionisation cap. Rerun-only |
 | n_H nudge (±0.001 dex) | deterministic crashes only | 10^11.501 and 10^11.499 agree to ≤ 0.001 dex in every band; leave-one-out fits along n_H show nudged points as smooth as their neighbours | a manual stage, not a default |
 
@@ -175,7 +175,7 @@ Build checks (`archive/2026-10-21_core_grid_checks/`), all passed on all 19 grid
 - fill leave-one-out errors 1.5–3.4% (first fill).
 
 **The dense core rebuilt with the final fill** (job 1391692; `archive/2026-10-23_gas_enshrouded_core_v5_checks/`, 23 Oct): the checks above pass again (normalisation within 1.3×10⁻⁴; 340 sampled models equal their runs to 2×10⁻¹⁶; flags as MANIFEST; no failures, no empty models; leave-one-out 1.5–3.5%). Against the first fill:
-- the 13,436 models that aren't filled are bit-identical in every dataset, so only the fill changed;
+- the 13,436 models that aren't filled are identical in every dataset, so only the fill changed;
 - every filled part (transmitted, nebular continuum, linecont, line luminosities) now lies between its two T neighbours at every wavelength; the first fill's linecont reached 1.45× the brighter neighbour;
 - in the bands at z = 6 only F115W moves noticeably, in the adjacent filled pair (13/824 and 14/824): 0.31× and 0.62× of the first fill. Every other band changes by < 1%.
 - The parts are clipped separately, so their sum can still sit above both neighbours: F115W at z = 6 in that pair is 0.06 and 0.19 dex above the brighter one (first fill: up to 0.51 dex). The band is line-dominated and heavily absorbed there.
@@ -187,7 +187,7 @@ The shipped file (`..._cloudy-gas_enshrouded_core.hdf5`) is installed in `synthe
 - ~~The no-op test~~ done. `failures 100`, `set pressure ionize 300000` and `iterate to convergence 100` are now defaults in `make_cloudy_inputs.py` (author, 17 Oct). Their text matches the tested decks exactly (8/8). Masers off stays rerun-only, and its 4 grid points carry the `masers_off` flag.
 - ~~Build every grid and check it~~ done (21 Oct). ~~Rebuild the dense core with the final fill and re-check it, then install the grids~~ done (22–23 Oct).
 - ~~Check that a sample of grid points reproduces from scratch with the recipe defaults, including one from each failure class~~ dropped (author, 24 Oct 2026): no CLOUDY reruns for reproduction. The grid may change with the author's work on the CLOUDY AGN incident shape, and the whole grid could be rerun in about a week of jobs if needed.
-- Reproduction instead (author, 24 Oct 2026): after the raw runs move to their long-term place, rebuild a variation grid and a core grid from the kept copy and compare them with the installed files. **Done (job 1392405):** the gas-enshrouded core and the standard-BLR turbulence variation are identical to the installed grids apart from the build stamps (`archive/2026-10-24_agn_grid_reproduction/`). The evidence so far: the build checks (§6), in which sampled models equal their own CLOUDY runs to 2×10⁻¹⁶, and the install, byte-identical to the builds.
+- Reproduction instead (author, 24 Oct 2026): after the raw runs move to their long-term place, rebuild a variation grid and a core grid from the kept copy and compare them with the installed files. **Done (job 1392405):** the gas-enshrouded core and the standard-BLR turbulence variation are identical to the installed grids apart from the build stamps (`archive/2026-10-24_agn_grid_reproduction/`). The evidence so far: the build checks (§6), in which sampled models equal their own CLOUDY runs to 2×10⁻¹⁶, and the install, identical to the builds.
 - ~~The pilot band comparison (§8)~~ done: the dense v_turb 500 variation is kept (author, 21 Oct).
 
 ## 8. Pilot band comparisons
