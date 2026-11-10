@@ -99,6 +99,15 @@ Solved in the builder since:
   axes, unravelling the model number in C order puts per-model datasets at the wrong grid
   points. The builder takes each model's grid index from syncretize's own index list
   (`model_grid`). Grids with one photoionisation axis were never affected.
+- **The temperature axis was renamed after the runs** (4 Nov 2026). It is now
+  `blue_bump_temperature`, the name syncretize's `cloudy_agn` grids and synthesizer's black holes
+  use, and the shipped grids were renamed to match. The CLOUDY runs were made when the axis was
+  `big_bump_temperature`, so their incident-grid copies and run records (`<index>.yaml`) still use
+  that name. Renaming the key in the scripts alone would stop the recipe rebuilding the grids
+  from the kept runs, so the scripts read either name and write only the new one.
+  `make_incident_grid.py` holds both names (`T_AXIS`, `T_AXIS_BEFORE_RENAME`, `axis_name`).
+  `parse_cloudy_runs.py` reads the run records through `axis_name`, and `build_agn_grids.py`
+  gives syncretize an incident copy with the new name, so every grid it builds has the new name.
 
 ## 5. Verification
 **Checks on the built grids** (report §6; `archive/2026-10-21_core_grid_checks/`,
@@ -116,3 +125,8 @@ copy of the runs and compared with the installed files (author, 24 Oct 2026). **
 (117 reruns, 4 filled holes) and the standard-BLR turbulence variation (15 reruns) rebuilt from
 the kept runs are identical to the installed grids in every dataset and attribute, apart from the
 two build stamps (`smock_build`, syncretize's `date_created`).
+**Again after the axis rename (10 Nov 2026; job 1406566 and a login-node build;
+`archive/2026-11-10_axis_rename_recipe_check/`):** the same two grids rebuilt from the kept runs,
+whose records use the axis's old name, are identical to the installed (renamed) grids in every
+dataset. Two attributes differ: the installed files' note of the rename (`smock_axis_renamed`),
+and the wording of `smock_build_note`, which changed after these grids were built.

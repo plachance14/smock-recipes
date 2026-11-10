@@ -2,7 +2,7 @@
 
 The spectra feed syncretize's incident-grid route (``create_cloudy_input_grid.py``
 turns each one into a ``table SED``). Each output file has a single axis, the
-big-bump temperature, because syncretize runs every incident point against every
+temperature of the big bump (``blue_bump_temperature``, see T_AXIS), because syncretize runs every incident point against every
 photoionisation point. A separate file is written for each global (alpha_ox,
 alpha_uv) pair, so the alpha variations stay one-at-a-time.
 
@@ -41,11 +41,26 @@ E_MAX_RYD = 1e8 / 13.605693122994  # 100 MeV in Ryd
 TE1RYD = 157887.512  # 1 Ryd in K (CLOUDY physconst TE1RYD = h c R_inf / k)
 SEXP_LIMIT = 84.0  # CLOUDY's sexp() returns 0 beyond this
 
+# The temperature axis's name. It was big_bump_temperature until 4 Nov 2026, then became
+# blue_bump_temperature, the name syncretize's cloudy_agn grids and synthesizer's black holes use.
+# The CLOUDY runs behind the shipped grids were made before that, so their incident-grid copies
+# and run records (<index>.yaml) still carry the old name. The recipe reads either name, through
+# axis_name() (parse_cloudy_runs.py, build_agn_grids.py), and writes only the new one.
+T_AXIS = "blue_bump_temperature"
+T_AXIS_BEFORE_RENAME = "big_bump_temperature"
+T_AXIS_DESCRIPTION = "Blue-bump temperature of the CLOUDY agn continuum"
+
+
+def axis_name(name):
+    """An axis name as the recipe uses it: the temperature axis's old name becomes T_AXIS."""
+    return T_AXIS if name == T_AXIS_BEFORE_RENAME else name
+
+
 # Points per decade of the tabulated SED. 0.005 dex resolves the exp(-x/x_bb)
 # cutoff at 10^4 K to well under 1% between points.
 DEX_STEP = 0.005
 
-# The 20-point big-bump temperature axis (cloudy_grid_plan.txt).
+# The 20-point temperature axis (cloudy_grid_plan.txt).
 LOG_T_AXIS = [
     4.00, 4.05, 4.10, 4.15, 4.20, 4.25, 4.30,
     4.40, 4.50, 4.60, 4.70, 4.80, 4.90, 5.00,
@@ -163,12 +178,10 @@ def write_incident_grid(path, log_T, alpha_ox, alpha_uv):
     out = GridFile(str(path))
     out.write_grid_common(
         model=model,
-        axes={"big_bump_temperature": 10.0 ** np.array(log_T) * K},
-        descriptions={
-            "big_bump_temperature": "Big-bump temperature of the CLOUDY agn continuum"
-        },
+        axes={T_AXIS: 10.0 ** np.array(log_T) * K},
+        descriptions={T_AXIS: T_AXIS_DESCRIPTION},
         wavelength=lam,
-        log_on_read={"big_bump_temperature": True},
+        log_on_read={T_AXIS: True},
         spectra={"incident": spec * erg / s / Hz},
         weight="bolometric_luminosities",
     )

@@ -32,9 +32,11 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from make_incident_grid import T_AXIS, axis_name
+
 STOP_RE = re.compile(r"Calculation stopped because (.+?) Iteration\s+(\d+) of\s+(\d+)")
 END_RE = re.compile(r"Cloudy ends:\s*(\d+) zones?, (\d+) iterations?.*ExecTime\(s\)\s*([\d.]+)")
-PARAM_KEYS = ["big_bump_temperature", "ionisation_parameter", "hydrogen_density",
+PARAM_KEYS = [T_AXIS, "ionisation_parameter", "hydrogen_density",
               "stop_column_density", "turbulence", "metallicities"]
 
 
@@ -67,12 +69,15 @@ def parse_out(path):
 
 
 def model_params(model_dir, index):
-    """The run's parameters from syncretize's <index>.yaml, as log10 where natural."""
-    p = yaml.safe_load((model_dir / f"{index}.yaml").read_text())
+    """The run's parameters from syncretize's <index>.yaml, as log10 where natural.
+
+    Runs made before 4 Nov 2026 name the temperature axis big_bump_temperature (axis_name).
+    """
+    p = {axis_name(k): v for k, v in yaml.safe_load((model_dir / f"{index}.yaml").read_text()).items()}
     aox = re.search(r"aox(-?[\d.]+)", model_dir.parent.name)
     auv = re.search(r"auv(-?[\d.]+)", model_dir.parent.name)
     return {
-        "log_T": round(np.log10(p["big_bump_temperature"]), 3),
+        "log_T": round(np.log10(p[T_AXIS]), 3),
         "log_U": round(np.log10(p["ionisation_parameter"]), 3),
         "log_nH": round(np.log10(p["hydrogen_density"]), 3),
         "log_NH": float(p["stop_column_density"]),

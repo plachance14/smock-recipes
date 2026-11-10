@@ -13,7 +13,9 @@ Each grid is built by syncretize's own create_synthesizer_grid.py, run unchanged
     with its cycle amplitude. Each hole is given its fill stencil
     along T (step 5).
  2. Cut the axes (KEEP): a copy of the incident grid holding only the kept values, and
-    parameter YAMLs trimmed to match, so syncretize never sees a cut model.
+    parameter YAMLs trimmed to match, so syncretize never sees a cut model. The copy
+    names the temperature axis blue_bump_temperature even when the kept runs' incident grid
+    has its old name, big_bump_temperature (make_incident_grid.py, T_AXIS).
  3. Link the chosen outputs into final/<grid>/<incident_index>/<index>.* (relative
     symlinks), re-indexed to the cut grid by matching parameter values. A hole gets only
     its .out, so syncretize records it as a failure (zeros, failures = 1).
@@ -63,14 +65,15 @@ import yaml
 from synthesizer_grids.cloudy.utils import get_cloudy_params, get_grid_props_cloudy
 
 from make_cloudy_inputs import PARAMS, RUN_SETS, SYNCRETIZE_CLOUDY, syncretize_grid_name
+from make_incident_grid import T_AXIS, T_AXIS_DESCRIPTION, axis_name
 
 GRID_RUN_SETS = ("blr_core", "dense_core", "blr_variations", "dense_variations")
 
-# Kept axis values, per family (the base YAML's prefix). Only the incident (big-bump
-# temperature) axis is cut so far (cloudy_grid_report.md §6).
+# Kept axis values, per family (the base YAML's prefix). Only the incident (temperature)
+# axis is cut so far (cloudy_grid_report.md §6).
 KEEP = {
-    "blr": {"big_bump_temperature": lambda T: np.log10(T) >= 4.25 - 1e-6},
-    "dense": {"big_bump_temperature": lambda T: np.log10(T) >= 4.2 - 1e-6},
+    "blr": {T_AXIS: lambda T: np.log10(T) >= 4.25 - 1e-6},
+    "dense": {T_AXIS: lambda T: np.log10(T) >= 4.2 - 1e-6},
 }
 
 # Rerun stages under <work>/reruns/ as (run list, its parse CSV), oldest first: an ok run
@@ -105,13 +108,13 @@ LIMIT_CYCLES = "cycle_test/cycle_amplitudes.csv"
 FLAGS = {"rerun": 1, "nudged": 2, "thick_es": 4, "hole": 8, "masers_off": 16, "limit_cycle": 32,
          "filled": 64}
 
-# Holes are filled along the big-bump temperature (author, 18 Oct 2026): synthesizer 1.3.1 would interpolate a hole's zero spectrum. A cubic in
+# Holes are filled along the temperature (author, 18 Oct 2026): synthesizer 1.3.1 would interpolate a hole's zero spectrum. A cubic in
 # log T through T-2, T-1, T+1, T+2, or, when T+1 (T-1) is a hole too, through T-2, T-1,
 # T+2, T+3 (T-3, T-2, T+1, T+2). Leave-one-out tests next to the holes:
 # archive/2026-10-18_cloudy_hole_fill_loo (the method) and
 # archive/2026-10-21_hole_fill_components (each stored spectrum, the zero rule and the
 # clip of every part to its bracketing neighbours, author 22 Oct 2026).
-FILL_AXIS = "big_bump_temperature"
+FILL_AXIS = T_AXIS
 FILL_STENCILS = ((-2, -1, 1, 2), (-2, -1, 2, 3), (-3, -2, 1, 2))
 
 # The fill error is measured in the bands the cycle test used.
@@ -228,10 +231,10 @@ def is_full_column_unconverged(row):
 
 
 def incident_axes(path):
-    """The incident grid's axis names and values, as stored."""
+    """The incident grid's axis names (as the recipe uses them, axis_name) and values."""
     with h5py.File(path) as f:
-        axes = [a for a in f.attrs["axes"]]
-        return axes, {a: f[f"axes/{a}"][:] for a in axes}
+        stored = [str(a) for a in f.attrs["axes"]]
+        return [axis_name(a) for a in stored], {axis_name(a): f[f"axes/{a}"][:] for a in stored}
 
 
 def kept_indices(axes, values, keep):
@@ -274,7 +277,8 @@ def write_cut_incident(src, dst, keep_idx):
     """Copy the incident grid with only the kept axis values, and WeightVariable "None".
 
     Every dataset whose leading dimensions are the grid shape is sliced; the rest
-    (wavelengths) are copied. See the module docstring on WeightVariable.
+    (wavelengths) are copied. See the module docstring on WeightVariable. A temperature
+    axis stored under its old name is written as T_AXIS (make_incident_grid.py).
     """
     with h5py.File(src) as f, h5py.File(dst, "w") as g:
         shape = tuple(len(f[f"axes/{a}"]) for a in f.attrs["axes"])
@@ -284,15 +288,20 @@ def write_cut_incident(src, dst, keep_idx):
                 g.require_group(name).attrs.update(obj.attrs)
                 return
             data = obj[()]
+            attrs = dict(obj.attrs)
             if name.startswith("axes/"):
-                axis = list(f.attrs["axes"]).index(name.split("/", 1)[1])
+                stored = name.split("/", 1)[1]
+                axis = [str(a) for a in f.attrs["axes"]].index(stored)
                 data = data[keep_idx[axis]]
+                if axis_name(stored) != stored:
+                    name, attrs["Description"] = f"axes/{axis_name(stored)}", T_AXIS_DESCRIPTION
             elif data.shape[:len(shape)] == shape:
                 data = data[np.ix_(*keep_idx)]
-            g.create_dataset(name, data=data).attrs.update(obj.attrs)
+            g.create_dataset(name, data=data).attrs.update(attrs)
 
         f.visititems(copy)
         g.attrs.update(f.attrs)
+        g.attrs["axes"] = np.array([axis_name(str(a)) for a in f.attrs["axes"]], dtype=object)
         g.attrs["WeightVariable"] = "None"
         g.attrs["smock_build_note"] = ("Build-time copy for syncretize: kept axis values "
                                        "only, WeightVariable 'None'.")
