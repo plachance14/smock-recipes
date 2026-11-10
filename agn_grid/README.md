@@ -12,6 +12,8 @@ the former; the latter are there to rebuild or extend the grids). The design (ax
 settings, timing pilot) is in `cloudy_grid_plan.txt`, and the record of what was run and why
 is in `cloudy_grid_report.md`. Published in smock's Google Drive folder (`../README.md`).
 
+**Lines in the spectra and in the line list** (checked 10 Nov 2026, `archive/2026-11-10_compactness_checks/`). Each grid holds its emission lines twice: in the spectra (`nebular`, and `linecont`, the lines alone) and as a list of 254 line luminosities (`lines/luminosity`). The two do not agree. The CLOUDY runs are plane-parallel slabs lit from one side; syncretize takes the spectra from CLOUDY's outward columns (`DiffOut` and the outward lines), the light leaving the far face, while the line list is CLOUDY's "emergent" list, which counts the light leaving both faces. Hα in the spectra is a median 19% of the listed value in the gas-enshrouded core (5–35%, lower for thicker clouds) and 37% in the standard-BLR core (19–51%). smock's images and spectra use the spectra; say which you use when you quote line strengths. (smock's BPASS stellar grid has no such difference: 1.07. smock expects to move to AGN grids built to the synthesizer/syncretize standard, where this may differ.)
+
 **Names.** The grids ship as `..._cloudy-standard_blr_*` and `..._cloudy-gas_enshrouded_*`
 (author, 22 Oct 2026; both are BLR-type grids in synthesizer's terms). Everything upstream
 keeps the internal run-set names `blr` and `dense`: the YAMLs in `params/`, `make_cloudy_inputs.py`'s
